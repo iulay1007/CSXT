@@ -13,124 +13,224 @@ struct goods
 };
 typedef struct goods NODE;
 void menu();
+NODE* creatNode(NODE *node);
 void addGoodsMsg(NODE *head,NODE *tail);
 void addGoodsAmount(NODE *head,NODE *tail);
 void showGoodsMsg(NODE *head);
-   
-    NODE *head, *tail;
+void saleGoods(NODE *node);
+void readMsg(NODE *head);
+void writeMsg(NODE *head);
 
+    NODE *head, *tail;
+   NODE *pnew,*rnode;
+   FILE *fpRead=fopen("data.txt","r");  
+
+  FILE *fpWrite=fopen("data.txt","at+");
 int main(){
 
+
+    if(fpWrite==NULL)  
+    {  
+        return 0;  
+    } 
+     
+    if(fpRead==NULL)  
+    { 
+        return 0;  
+    } 
+    
+     
    
+	 
+    //
+     //   printf("\t\t\t\t\t%s\t\t%d\t\t%.2f\n",pnew->name,pnew->amount,pnew->price);
+
+   // printf("%s%d%f",pnew->name,&pnew->amount,&pnew->price);
     head=(NODE*)malloc(sizeof(NODE));
+    
+  
     if(head==NULL)
     return -1;
-    head->next = NULL; //Í·½ÚµãµÄÖ¸ÕëÓòÖÃNULL 
-    tail = head;
+  
+    head->next=tail;
 
+  readMsg(head);
     while (1)
     {
+    	printf("\t\t\t\t\t");
         menu();
     int choice;
     scanf("%d",&choice);
     switch (choice)
     {
     case 1:
-    //Ôö¼ÓÉÌÆ·ÐÅÏ¢
+    //å¢žåŠ å•†å“ 
         addGoodsMsg(head,tail);
         break;
-    //Ôö¼ÓÉÌÆ·ÊýÁ¿
+    //å¢žåŠ æ•°é‡ 
     case 2:
         addGoodsAmount(head,tail);
         break;
-    //Õ¹Ê¾ÉÌÆ·ÐÅÏ¢
+    //å±•ç¤ºå•†å“ä¿¡æ¯ 
     case 3:
         showGoodsMsg(head);
         break;
-    default:
-        break;
+    //é”€å”®å•†å“ 
+    case 4:
+    	saleGoods(head);
+    	break;
+    default: 
+	printf("nothing!!"); 
+	break;
+    
 }
 
 }
+
+//fclose(fpWrite); 
 return 0;
 }
 
 void menu(){
 
-    printf("²Ëµ¥\n");
-    printf("1:Ôö¼ÓÉÌÆ·ÐÅÏ¢\n");
-    printf("2:Ôö¼ÓÉÌÆ·ÊýÁ¿\n");
-    printf("3:Õ¹Ê¾ÉÌÆ·ÐÅÏ¢\n");
-    printf("ÇëÊäÈëÄãÏëÒª½øÐÐµÄ²Ù×÷\n");
+	
+    printf("\n\n\t\t\t\t\t\tèœå•\n");
+    printf("\t\t\t\t\t-----------------------\n");
+    printf("\t\t\t\t\t1:å¢žåŠ å•†å“\n");
+    printf("\t\t\t\t\t2:å¢žåŠ å•†å“æ•°é‡\n");
+    printf("\t\t\t\t\t3:å±•ç¤ºå•†å“ä¿¡æ¯\n");
+     printf("\t\t\t\t\t4:é”€å”®å•†å“\n");
+    printf("\t\t\t\t\t-----------------------\n");
+    printf("\t\t\t\t\tè¯·è¾“å…¥æƒ³è¦è¿›è¡Œçš„æ“ä½œ:\n");
+    printf("\t\t\t\t\t");
+   
     
 
 }
+void readMsg(NODE *head)
+{
+		rnode= creatNode(rnode);
+	while(fscanf(fpRead,"%s %d %f",rnode->name,&rnode->amount,&rnode->price)!=EOF)
+{
+	 
+
+   rnode->next=head->next;
+	head->next=rnode; 
+	rnode= creatNode(rnode);  
+	}
+ 	fclose(fpRead);
+}
+NODE* creatNode(NODE *node){
+	node=(NODE *)malloc (sizeof(NODE));
+	node->next=NULL;
+	return node;
+}
 
 
-
-
-//Ìí¼ÓÉÌÆ·
-//Ë¼¿¼ÓÐÃ»ÓÐÌí¼ÓÒÑÓÐµÄ
 void addGoodsMsg(NODE *head,NODE *tail){
+	
+		fopen("data.txt","at+");
+//	fscanf(fpWrite,"%s",pnew->name);
+	//printf("%s",pnew->name); 
 
-    NODE *pnew;
-    pnew = (NODE *)malloc (sizeof(NODE));
-    pnew->next=NULL;
+   	pnew = creatNode(pnew);
+    printf("\t\t\t\t\tè¯·è¾“å…¥å•†å“åå­— æ•°é‡ ä»·æ ¼\n");
+	printf("\t\t\t\t\t");
+   	scanf("%s%d%f",pnew->name,&pnew->amount,&pnew->price);
+   	fprintf(fpWrite,"%s %d %.2f\n",pnew->name,pnew->amount,pnew->price);
+   	fclose(fpWrite);
+   	
    
-    
-    printf("ÇëÊäÈëÉÌÆ·Ãû×Ö ÊýÁ¿ ¼Û¸ñ");
-
-    scanf("%s%d%f",&pnew->name,&pnew->amount,&pnew->price);
-    printf("%s %d %.2f",pnew->name,pnew->amount,pnew->price);
-    tail->next=pnew;
-    tail=pnew;
-
-    //¶ÁÈëÎÄ¼þ£¡£¡
-    showGoodsMsg(head);
-
+   	// fprintf(fpWrite,"%s%d%f",pnew->name,&pnew->amount,&pnew->price);
+   	
+   	 system("cls");
+   	 printf("\n\n");
+    printf("\t\t\t\t\tæ·»åŠ %sæˆåŠŸ",pnew->name);
+ 
+   //å¯è¡Œï¼ï¼ 
+    pnew->next=head->next;
+	head->next=pnew; 
+  
 }
 
 void addGoodsAmount(NODE *head,NODE *tail){
-    printf("ÇëÊäÈëÉÌÆ·Ãû×Ö ÏëÒªÔö¼ÓµÄÊýÁ¿");
+	
+    printf("\t\t\t\t\tè¯·è¾“å…¥æƒ³å¢žåŠ çš„å•†å“åå­— æ•°é‡\n");
     NODE *pnode;
-     pnode = (NODE *)malloc (sizeof(NODE));
+   
      pnode=head;
     char name[20];
     int pamount;
+    	printf("\t\t\t\t\t");
     scanf("%s%d",name,&pamount);
-   // printf("%s  %d",name,pamount);
+  
    while (pnode!=NULL)
    {
       if(strcmp(pnode->name,name)==0)
-      {pnode->amount+=pamount;
-      printf("%s%d",pnode->name,pnode->amount);
+      {
+	  pnode->amount+=pamount;
+	     	 system("cls");
+	  printf("\t\t\t\t\tå¢žåŠ æ•°é‡æˆåŠŸ\n");
+      printf("\t\t\t\t\t%sçš„æ•°é‡ä¸º%d",pnode->name,pnode->amount);
       break;
       }
       pnode=pnode->next;
       
    }
    if(pnode==NULL)
-   printf("ÇëÔÚ¿â´æÀïÌí¼Ó¸ÃÉÌÆ·");
-
-   else
    {
-       printf("error");
-   }
-   
+   	system("cls");
+   	printf("\n\n");
+   printf("\t\t\t\t\tè¯·å…ˆæ·»åŠ å•†å“\n");} 
+
     fflush(stdin);
 
 
 }
 
 void showGoodsMsg(NODE *head){
-    NODE *pnode;
-     pnode = (NODE *)malloc (sizeof(NODE));
-     pnode=head;
+   NODE *pnode;
+       
+    pnode=head->next;
     while (pnode!=NULL)
     {
-        printf("%s",pnode->name);
-        pnode=pnode->next;    }
-    
+    printf("\t\t\t\t\tå•†å“å\t\tå•†å“æ•°é‡\tå•†å“ä»·æ ¼\n");
+    printf("\t\t\t\t\t%s\t\t%d\t\t%.2f\n",pnode->name,pnode->amount,pnode->price);
+       if(pnode->next==NULL)
+       		break;
+        pnode=pnode->next; 
+      }
+        
+}
 
-
+void saleGoods(NODE *head){
+	 NODE *pnode;
+     pnode=head;
+     float price;
+       char name[20];
+    int pamount;
+	printf("\t\t\t\t\t");
+	printf("è¯·è¾“å…¥å•†å“çš„åå­—å’Œéœ€è¦çš„æ•°é‡\n");
+	printf("\t\t\t\t\t");
+    scanf("%s%d",name,&pamount);
+  
+   while (pnode!=NULL)
+   {
+      if(strcmp(pnode->name,name)==0)
+      {
+      	if(pnode->amount<pamount)
+      	{
+		  printf("\t\t\t\t\tæ•°é‡ä¸è¶³\n"); 
+		  break;
+		}
+		price=pnode->price*pamount;
+	  pnode->amount-=pamount;
+		printf("\t\t\t\t\tä»·æ ¼ä¸º%.2f\n",price);
+      printf("\t\t\t\t\t%sçš„æ•°é‡ä¸º%d",pnode->name,pnode->amount);
+      break;
+      }
+      pnode=pnode->next;
+      
+   }
+	
 }
