@@ -8,6 +8,8 @@ struct goods
    char name [20];
    int amount;
    float price;
+   int sale_amount;
+   float sale_money;
    struct goods *next;
    
 };
@@ -27,6 +29,7 @@ void addGoodsAmount(NODE *head,NODE *tail);
 void showGoodsMsg(NODE *head);
 void saleGoods(NODE *node);
 void readMsg(NODE *head);
+void deleteGoods(NODE *head); 
 void writeMsg(NODE *head);
 void printTicket(SNODE *node);
 struct tm * showTime();
@@ -48,8 +51,6 @@ int main(){
     while (1)
     {
     
-   
-  
     	printf("\t\t\t\t\t");
         menu();
     int choice;
@@ -74,6 +75,10 @@ int main(){
     case 4:
     	saleGoods(head);
     	break;
+    //删除商品 
+    case 5:
+    	deleteGoods(head);
+    	break; 
     default: 
 	printf("nothing!!"); 
 	break;
@@ -95,6 +100,7 @@ void menu(){
     printf("\t\t\t\t\t2:增加商品数量\n");
     printf("\t\t\t\t\t3:展示商品信息\n");
      printf("\t\t\t\t\t4:销售商品\n");
+      printf("\t\t\t\t\t5:删除商品\n");
     printf("\t\t\t\t\t-----------------------\n");
     printf("\t\t\t\t\t输入0结束\n");
 	 printf("\t\t\t\t\t-----------------------\n"); 
@@ -121,7 +127,7 @@ void readMsg(NODE *head)
         return 0;  
     } */
 	rnode= creatNode(rnode);
-	while(fscanf(fpRead,"%s %d %f",rnode->name,&rnode->amount,&rnode->price)!=EOF)
+	while(fscanf(fpRead,"%s %d %f %d %f",rnode->name,&rnode->amount,&rnode->price,&rnode->sale_amount,&rnode->sale_money)!=EOF)
 	{
 	 
 
@@ -143,7 +149,7 @@ fopen("data.txt","wt");
 	ntemp=head->next;
 	while(ntemp!=NULL){
 
-	fprintf(wfpWrite,"%s %d %.2f\n",ntemp->name,ntemp->amount,ntemp->price);
+	fprintf(wfpWrite,"%s %d %.2f %d %.2f\n",ntemp->name,ntemp->amount,ntemp->price,ntemp->sale_amount,ntemp->sale_money);
 	ntemp=ntemp->next;
 	}
 	fclose(wfpWrite);
@@ -160,19 +166,32 @@ NODE* creatNode(NODE *node){
 void addGoodsMsg(NODE *head,NODE *tail){
 	
 
+while(1){
 
    	pnew = creatNode(pnew);
     printf("\t\t\t\t\t请输入商品名字 数量 价格\n");
+   	printf("\t\t\t\t\t-----------------------\n"); 
+	printf("\t\t\t\t\t输入break结束添加\n");
+	printf("\t\t\t\t\t-----------------------\n"); 
 	printf("\t\t\t\t\t");
-   	scanf("%s%d%f",pnew->name,&pnew->amount,&pnew->price);
+   	scanf("%s",pnew->name);
+   	 if(strcmp("break",pnew->name)==0)
+    {
+   	system("cls");
+	break;
+	}
+   	scanf("%d%f",&pnew->amount,&pnew->price);
+   		pnew->sale_amount=0;
+		pnew->sale_money=0;
  	 system("cls");
    	 printf("\n\n");
-    printf("\t\t\t\t\t添加%s成功",pnew->name);
+    printf("\t\t\t\t\t添加%s成功\n",pnew->name);
  
    //可行！！ 
     pnew->next=head->next;
 	head->next=pnew; 
 	
+}
 	//
 	writeMsg(head);
   
@@ -243,6 +262,7 @@ void saleGoods(NODE *head){
     float price;
     char name[20];
     int pamount;
+    char ch;
 	printf("\t\t\t\t\t");
 while(1){
 	pnode=head;
@@ -269,7 +289,13 @@ while(1){
 		  break;
 		}	
 		price=pnode->price*pamount;
+	
+	
+		pnode->sale_amount+=pamount;
+		pnode->sale_money=pnode->sale_money+price;
+		printf("\t\t%d\t%f\n",pnode->sale_amount,pnode->sale_money);
 	  	pnode->amount-=pamount;
+	  	
 	
 	
 		SNODE *temp;
@@ -288,14 +314,22 @@ while(1){
       
       
    }
-
- printTicket(printlist);
+	fflush(stdin);
+	printf("\t\t\t\t\t\t \n");
+	printf("\t\t\t\t\t\t输入Y打印小票 \n");
+	printf("\n\n\t\t\t\t\t-------------------------------------\n\n"); 
+	printf("\t\t\t\t\t\t");
+  	scanf("%c",&ch);
+	  if(ch == 'Y') {
+	  system("cls");
+	 printTicket(printlist);
+	 }
   	writeMsg(head);
-	
+  
 }
 
 void printTicket(SNODE *node){
-	 FILE *tfpWrite=fopen("ticket.txt","wt");
+	FILE *tfpWrite=fopen("ticket.txt","wt");
 	SNODE *tnode;
 	tnode=node->next;
 	float total;
@@ -322,3 +356,46 @@ void printTicket(SNODE *node){
 	fprintf(tfpWrite,"\t\t应收:\t%.2f",total);
 	fclose(tfpWrite);
 }
+
+
+void deleteGoods(NODE *head){
+	
+	 printf("\t\t\t\t\t请输入想删除的商品名字\n");
+    NODE *pnode;
+   	NODE *prv;
+   
+     pnode=head;
+    // prv->next=head;
+    char name[20];
+  printf("\t\t\t\t\t");
+     scanf("%s",name);
+  
+   while (pnode!=NULL)
+   {
+      if(strcmp(pnode->name,name)==0)
+      {
+	 
+	     	 system("cls");
+	  
+      printf("\t\t\t\t\t删除%s成功",pnode->name);
+     
+      prv->next=pnode->next;
+    
+      break;
+      }
+        prv=pnode;
+      pnode=pnode->next;
+    
+      
+   }
+   if(pnode==NULL)
+   {
+  // 	system("cls");
+   	printf("\n\n");
+   printf("\t\t\t\t\t不存在该商品\n");} 
+
+	writeMsg(head);
+
+}
+
+
