@@ -5,8 +5,7 @@
 #include <Windows.h>
 struct goods
 {
-   int num;
-   char name [20];
+   char name [20]; 
    int amount;
    float price;
    int sale_amount;
@@ -32,58 +31,74 @@ struct User{
 typedef struct goods NODE;
 typedef struct goodsOnSale SNODE;
 struct tm * showTime();
-void menu1();
-void menu2();
+//菜单 
+void menuOne();
+void menuTwo();
+void registerOrLoginMenu();
+//注册 
 void register1(); 
+//登录 
 int login();
+//建立节点 
 NODE* creatNode(NODE *node);
 User* creatUser(User *node);
+//检查User的名字与密码是否正确 
 int checkinUser(char *username,char *password);
+//登录状态检测 
 int login_callback(int code);
+//查询是否存在user ，根据返回值判断结果 
 int searchUser(char *username);
+//寻找User并返回User 
 User* findUser(User *head,char *username); 
+//增加User信息 
 void addUserMsg(User *node);
+//读入User信息 
 void readUserMsg(User *head); 
+//写入User信息 
 void writeUserMsg(User *head);
+//增加商品信息 
 void addGoodsMsg(NODE *head);
-void addGoodsAmount(NODE *head,NODE *tail);
+//增加商品数量 
+void addGoodsAmount(NODE *head);
+//展示商品信息 
 void showGoodsMsg(NODE *head);
+//销售商品 
 void saleGoods(NODE *node);
+//读入商品信息 
 void readMsg(NODE *head);
+//删除商品 
 void deleteGoods(NODE *head); 
+//写入商品信息 
 void writeMsg(NODE *head);
+//打印小票 
 void printTicket(SNODE *node);
 
 
 	NODE *head, *tail;
    NODE *pnew,*rnode;
    User *uhead,*unode;
+   //登录的User 
    User *user;
  
 int main(){
 	int temp;
 	int ch;
     head=(NODE*)malloc(sizeof(NODE));
-  uhead=creatUser(uhead);
+  	uhead=creatUser(uhead);
     if(head==NULL)
     return -1;
-   //删除 
     head->next=tail;	
    readMsg(head);
    readUserMsg(uhead);
-     printf("\t\t\t\t\t-----------------------\n");
-   printf("\n\t\t\t\t\t   输入1：登录\n\t\t\t\t\t   输入2：注册\n\n");
-    printf("\t\t\t\t\t-----------------------\n");
-   printf("\t\t\t\t\t");
+   registerOrLoginMenu();
    scanf("%d",&temp);
    system("cls");
+   //注册/登录界面 
    while(1){
-   
-  
    if(temp==1)
     {
+    	//根据登录返回结果决定下一步操作 
     	int result=login();
-    
 	if(result==0)
 	{
 	printf("\t\t\t\t\t-----------------------\n");
@@ -91,11 +106,9 @@ int main(){
     printf("\t\t\t\t\t-----------------------\n");
    printf("\t\t\t\t\t");
    scanf("%d",&ch);
-   //  system("cls");
    if(ch==2)
    {
    register1();
-   //
    }
    if(ch==1)
    {
@@ -103,11 +116,9 @@ int main(){
    continue;
    }
    
-   
    }else if(result==1)
    break;
   
-
 	}
 
 	else if(temp==2) 
@@ -119,12 +130,13 @@ int main(){
    }
 }
 	system("cls");
-	// 1:销售员\n\t\t\t\t\t    2:库存管理员
+	// 1:销售员    2:库存管理员
+	//根据User的身份标识决定展示什么菜单 
 	if(user->identity==1)
 	{	
 	while(1){
 		printf("\t\t\t\t\t");
-        menu1();
+        menuOne();
     int choice;
     scanf("%d",&choice);
    
@@ -154,7 +166,7 @@ else if(user->identity==2)
 	while(1){
 		 
     	printf("\t\t\t\t\t");
-        menu2();
+        menuTwo();
     int choice;
     scanf("%d",&choice);
    
@@ -169,7 +181,7 @@ else if(user->identity==2)
         break;
     //增加数量 
     case 2:
-        addGoodsAmount(head,tail);
+        addGoodsAmount(head);
         break;
     //展示商品信息 
     case 3:
@@ -192,6 +204,8 @@ else if(user->identity==2)
 
 return 0;
 }
+
+//注册User 
 	void register1(){
 		system("cls");
 	User *user;
@@ -205,32 +219,31 @@ return 0;
 	    
 	    printf("\t\t\t\t\t    请输入用户名:\n");
 	    
-			while(1)	{
+		while(1)	{
 		printf("\t\t\t\t\t");
 		  scanf("%s",user->name);
+		  //查找User列表看是否已存在该用户 
 	   int callback= searchUser(user->name);
 	   if (callback==1)
 	   {
 	   printf("\n\t\t\t\t\t用户名已存在，请重新输入用户名:\n");
 	   }
 	   else 
-	   
-		break;
+	break;
 	   }
-
 	    printf("\n\t\t\t\t\t    请输入密码:\n");
 		printf("\t\t\t\t\t");
 		scanf("%s",user->password);
 		printf("\t\t\t\t\t    请选择身份\n");
 		printf("\t\t\t\t\t    1:销售员\n\t\t\t\t\t    2:库存管理员\n\t\t\t\t\t");
 		scanf("%d",&user->identity);
+		//写入User信息 
 		addUserMsg(user);
 		
 } 
 
 int login(){
 
-	//User *user;
 	char username[20];
     char password[20];
 	int result; 
@@ -244,13 +257,13 @@ int login(){
 		printf("\t\t\t\t\t");
 		 scanf("%s",password);
 		result=	checkinUser(username,password); 
+		//根据result决定显示的提示信息 
 		login_callback(result);
-		//!!!!!
 		if(result==1)
 		user=findUser(uhead,username); 
 		  //检测用户名是否存在 
 		 //检测密码是否正确 
-		 //if()0,1,2
+	
 		 return result;
 	
 }
@@ -267,13 +280,13 @@ int login_callback(int code){
 			printf("\n\t\t\t\t\t    密码错误 \n");
 		return code;
 }
+
+//读入User的信息 
 void readUserMsg(User *head){
+	 
 		FILE *ufRead=fopen("User.txt","r");  
 	fopen("User.txt","r");  
-	  /*if(fpRead==NULL)  
-    { 
-        return 0;  
-    } */
+
 	unode= creatUser(unode);
 	while(fscanf(ufRead,"%s %s %d",unode->name,unode->password,&unode->identity)!=EOF)
 	{
@@ -285,7 +298,7 @@ void readUserMsg(User *head){
 	}
  	fclose(ufRead);
 }
-
+//写入User的信息 
 void writeUserMsg(User *head){
 	FILE *ufpWrite=fopen("User.txt","wt");
 	fopen("User.txt","wt");
@@ -300,19 +313,18 @@ void writeUserMsg(User *head){
 	fclose(ufpWrite);
 	
 } 
-
+//添加User 
 void addUserMsg(User *node){
 	
-	
-   //可行！！ 
+ 
     node->next=uhead->next;
-	uhead->next=node; 
-	
+	uhead->next=node; 	
 	writeUserMsg(uhead);
 	
 	
 }
 
+//查询User是否存在 
 int searchUser(char *username){
 	User *snode;
    
@@ -333,6 +345,7 @@ int searchUser(char *username){
 	 return 0;//不存在用户名，可创建 
 }
 
+//寻找User并返回 
 User* findUser(User *head,char *username ){
 		User *tnode;
    		tnode=uhead;
@@ -350,7 +363,7 @@ User* findUser(User *head,char *username ){
 	 } 
 	 return tnode;//不存在用户名，可创建 
 	}
-
+//检查User的账号密码 
 int checkinUser(char *username,char *password){
 	
 	User *pnode;
@@ -381,65 +394,22 @@ int checkinUser(char *username,char *password){
     return 0;//用户不存在 
 }
 } 
-
+//创建User节点 
 User* creatUser(User *node){
 		node=(User *)malloc (sizeof(User));
 	node->next=NULL;
 	return node;
 }
-void menu1(){
-
-	printf("\n\n\t\t\t\t\t\t菜单\n");
-    printf("\t\t\t\t\t-----------------------\n");
-    printf("\t\t\t\t\t1:销售商品\n");
-    printf("\t\t\t\t\t2:展示商品信息\n");
-    printf("\t\t\t\t\t-----------------------\n");
-    printf("\t\t\t\t\t输入0结束\n");
-	 printf("\t\t\t\t\t-----------------------\n"); 
-    printf("\t\t\t\t\t请输入想要进行的操作:\n");
-    printf("\t\t\t\t\t");
-   
-
-}
-void menu2(){
-
-	
-    printf("\n\n\t\t\t\t\t\t菜单\n");
-    printf("\t\t\t\t\t-----------------------\n");
-    printf("\t\t\t\t\t1:增加商品\n");
-    printf("\t\t\t\t\t2:增加商品数量\n");
-    printf("\t\t\t\t\t3:展示商品信息\n");
-     printf("\t\t\t\t\t4:删除商品\n");
-    printf("\t\t\t\t\t-----------------------\n");
-    printf("\t\t\t\t\t输入0结束\n");
-	 printf("\t\t\t\t\t-----------------------\n"); 
-    printf("\t\t\t\t\t请输入想要进行的操作:\n");
-    printf("\t\t\t\t\t");
-   
-    
-
-}
-  struct tm * showTime(){
-	 time_t t;
-    struct tm * lt;
-    time (&t);//获取Unix时间戳。
-    lt = localtime (&t);//转为时间结构。
-    printf ( "\t\t\t\t\t%d/%d/%d %d:%d:%d\n",lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);//输出结果
-  return lt;
-} 
+//读取商品信息 
 void readMsg(NODE *head)
 {
 	FILE *fpRead=fopen("data.txt","r");  
 	fopen("data.txt","r");  
-	  /*if(fpRead==NULL)  
-    { 
-        return 0;  
-    } */
+	  
 	rnode= creatNode(rnode);
 	while(fscanf(fpRead,"%s %d %f %d %f",rnode->name,&rnode->amount,&rnode->price,&rnode->sale_amount,&rnode->sale_money)!=EOF)
 	{
 	 
-
    rnode->next=head->next;
 	head->next=rnode; 
 	rnode= creatNode(rnode);  
@@ -448,7 +418,7 @@ void readMsg(NODE *head)
 }
 
 
-
+//写入商品信息 
 void writeMsg(NODE *head){
 
  FILE *wfpWrite=fopen("data.txt","wt");
@@ -465,13 +435,14 @@ fopen("data.txt","wt");
 	
 }
 
+//创建商品节点 
 NODE* creatNode(NODE *node){
 	node=(NODE *)malloc (sizeof(NODE));
 	node->next=NULL;
 	return node;
 }
 
-
+//添加商品信息 
 void addGoodsMsg(NODE *head){
 	
 
@@ -495,18 +466,17 @@ while(1){
  	 system("cls");
    	 printf("\n\n");
     printf("\t\t\t\t\t添加%s成功\n",pnew->name);
- 
-   //可行！！ 
+  
     pnew->next=head->next;
 	head->next=pnew; 
 	
 }
-	//
+
 	writeMsg(head);
   
 }
-
-void addGoodsAmount(NODE *head,NODE *tail){
+//增加商品数量 
+void addGoodsAmount(NODE *head){
 
 
     printf("\t\t\t\t\t请输入想增加的商品名字 数量\n");
@@ -542,6 +512,7 @@ void addGoodsAmount(NODE *head,NODE *tail){
 
 }
 
+//展示商品信息 
 void showGoodsMsg(NODE *head){
    NODE *ppnode;
        
@@ -558,6 +529,7 @@ void showGoodsMsg(NODE *head){
         
 }
 
+//销售商品 
 void saleGoods(NODE *head){
 	NODE *pnode;
     pnode=head;
@@ -599,8 +571,7 @@ while(1){
 	
 	
 		pnode->sale_amount+=pamount;
-		pnode->sale_money=pnode->sale_money+price;
-//		printf("\t\t%d\t%f\n",pnode->sale_amount,pnode->sale_money);
+		pnode->sale_money=pnode->sale_money+price; 
 	  	pnode->amount-=pamount;
 	  		
 		SNODE *temp;
@@ -633,6 +604,7 @@ while(1){
   
 }
 
+//打印小票 
 void printTicket(SNODE *node){
 	FILE *tfpWrite=fopen("ticket.txt","wt");
 	SNODE *tnode;
@@ -642,7 +614,8 @@ void printTicket(SNODE *node){
 	printf("\n\n\t\t\t\t\t-------------------------------------\n\n"); 
 	fprintf(tfpWrite,"\n\n\t\t-------------------------------------\n\n");
 	lt=showTime();
-	fprintf (tfpWrite,"\t\t%d/%d/%d %d:%d:%d\n",lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
+	fprintf (tfpWrite,"\t\t%d/%d/%d %d:%d:%d\n",lt->tm_year+1900,
+	 lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
 	fprintf(tfpWrite,"\t\t\t\t\t销售员：%s\n",user->name);
 	printf("\t\t\t\t\t销售员：%s\n",user->name);
 	printf("\n\t\t\t\t\t-------------------------------------\n");
@@ -664,7 +637,7 @@ void printTicket(SNODE *node){
 	fclose(tfpWrite);
 }
 
-
+//删除商品 
 void deleteGoods(NODE *head){
 	
 	 printf("\t\t\t\t\t请输入想删除的商品名字\n");
@@ -672,7 +645,6 @@ void deleteGoods(NODE *head){
    	NODE *prv;
    
      pnode=head;
-    // prv->next=head;
     char name[20];
   printf("\t\t\t\t\t");
      scanf("%s",name);
@@ -697,7 +669,6 @@ void deleteGoods(NODE *head){
    }
    if(pnode==NULL)
    {
-  // 	system("cls");
    	printf("\n\n");
    printf("\t\t\t\t\t不存在该商品\n");} 
 
@@ -705,4 +676,51 @@ void deleteGoods(NODE *head){
 
 }
 
+void menuOne(){
+
+	printf("\n\n\t\t\t\t\t\t菜单\n");
+    printf("\t\t\t\t\t-----------------------\n");
+    printf("\t\t\t\t\t1:销售商品\n");
+    printf("\t\t\t\t\t2:展示商品信息\n");
+    printf("\t\t\t\t\t-----------------------\n");
+    printf("\t\t\t\t\t输入0结束\n");
+	 printf("\t\t\t\t\t-----------------------\n"); 
+    printf("\t\t\t\t\t请输入想要进行的操作:\n");
+    printf("\t\t\t\t\t");
+   
+
+}
+void menuTwo(){
+
+	
+    printf("\n\n\t\t\t\t\t\t菜单\n");
+    printf("\t\t\t\t\t-----------------------\n");
+    printf("\t\t\t\t\t1:增加商品\n");
+    printf("\t\t\t\t\t2:增加商品数量\n");
+    printf("\t\t\t\t\t3:展示商品信息\n");
+     printf("\t\t\t\t\t4:删除商品\n");
+    printf("\t\t\t\t\t-----------------------\n");
+    printf("\t\t\t\t\t输入0结束\n");
+	 printf("\t\t\t\t\t-----------------------\n"); 
+    printf("\t\t\t\t\t请输入想要进行的操作:\n");
+    printf("\t\t\t\t\t");
+   
+    
+
+}
+void registerOrLoginMenu(){
+ printf("\t\t\t\t\t-----------------------\n");
+   printf("\n\t\t\t\t\t   输入1：登录\n\t\t\t\t\t   输入2：注册\n\n");
+    printf("\t\t\t\t\t-----------------------\n");
+   printf("\t\t\t\t\t");
+	
+}
+  struct tm * showTime(){
+	 time_t t;
+    struct tm * lt;
+    time (&t);//获取Unix时间戳。
+    lt = localtime (&t);//转为时间结构。
+    printf ( "\t\t\t\t\t%d/%d/%d %d:%d:%d\n",lt->tm_year+1900, lt->tm_mon+1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);//输出结果
+  return lt;
+} 
 
